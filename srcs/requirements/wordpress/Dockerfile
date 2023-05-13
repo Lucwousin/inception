@@ -9,6 +9,7 @@ RUN apk update && apk upgrade && apk add --no-cache \
     php-phar        \
     php-openssl     \
     php-mysqli      \
+    php-iconv       \
     mariadb-client
 
 
