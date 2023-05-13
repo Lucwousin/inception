@@ -12,5 +12,7 @@ if [ ! -f .installed ]; then
 fi
 
 rm -f /etc/php8/php-fpm.d/www.conf
+chown wordpress:wordpress -R /data/wordpress/*
+chown 755 -R /data/wordpress/*
 
 php-fpm8 -F
