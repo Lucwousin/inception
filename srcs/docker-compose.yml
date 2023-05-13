@@ -1,0 +1,92 @@
+name: inception
+
+services:
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx/.
+    ports:
+      - "443:443"
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - wordpress
+    volumes:
+      - wordpress_files:/data/wordpress
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/http.d/default.conf
+    restart: always
+
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress/.
+    networks:
+      - backend
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress_files:/data/wordpress
+    configs:
+      - source: php-fpm_config
+        target: /etc/php8/php-fpm.conf
+      - source: wp_pool_conf
+        target: /etc/php8/php-fpm.d/wp_pool.conf
+    environment:
+      - MARIADB_HOST=${MARIADB_HOST}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - DOMAIN=${DOMAIN}
+      - WP_TITLE=${WP_TITLE}
+      - WP_ADMIN_USER=${WP_ADMIN_USER}
+      - WP_ADMIN_PASS=${WP_ADMIN_PASS}
+      - WP_ADMIN_MAIL=${WP_ADMIN_MAIL}
+      - WP_USER_MAIL=${WP_USER_MAIL}
+      - WP_USER_PASS=${WP_USER_PASS}
+      - WP_USER_USER=${WP_USER_USER}
+    restart: always
+
+  mariadb:
+    container_name: mariadb
+    build: ./requirements/mariadb/.
+    networks:
+      - backend
+    volumes:
+      - wordpress_db:/data/wordpress_db
+    configs:
+      - source: mariadb_conf
+        target: /etc/my.cnf.d/mariadb.conf
+    environment:
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+
+volumes:
+  wordpress_files:
+    driver: local
+    driver_opts:
+      device: ~/data/wordpress
+      o: bind
+      type: none
+  wordpress_db:
+    driver: local
+    driver_opts:
+      device: ~/data/wordpress_db
+      o: bind
+      type: none
+
+configs:
+  nginx_config:
+    file: ./requirements/nginx/conf/nginx.conf
+  php-fpm_config:
+    file: ./requirements/wordpress/conf/php-fpm.conf
+  wp_pool_conf:
+    file: ./requirements/wordpress/conf/wp_pool.conf
+  mariadb_conf:
+    file: ./requirements/mariadb/conf/mariadb.conf
+
+networks:
+  frontend:
+  backend:
