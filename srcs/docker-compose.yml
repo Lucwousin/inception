@@ -1,9 +1,11 @@
+version: '3.9'
 name: inception
 
 services:
   nginx:
     container_name: nginx
-    build: ./requirements/nginx/.
+    build:
+      context: requirements/nginx
     ports:
       - "443:443"
     networks:
@@ -16,12 +18,13 @@ services:
       - source: nginx_config
         target: /etc/nginx/http.d/default.conf
     environment:
-      - DOMAIN=${DOMAIN}
-    restart: always
+      - DOMAIN_NAME=${DOMAIN_NAME}
+    restart: unless-stopped
 
   wordpress:
     container_name: wordpress
-    build: ./requirements/wordpress/.
+    build:
+      context: requirements/wordpress
     networks:
       - backend
     depends_on:
@@ -29,8 +32,6 @@ services:
     volumes:
       - wordpress_files:/data/wordpress
     configs:
-      - source: php-fpm_config
-        target: /etc/php8/php-fpm.conf
       - source: wp_pool_conf
         target: /etc/php8/php-fpm.d/wp_pool.conf
     environment:
@@ -38,7 +39,7 @@ services:
       - MARIADB_DATABASE=${MARIADB_DATABASE}
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
-      - DOMAIN=${DOMAIN}
+      - DOMAIN_NAME=${DOMAIN_NAME}
       - WP_TITLE=${WP_TITLE}
       - WP_ADMIN_USER=${WP_ADMIN_USER}
       - WP_ADMIN_PASS=${WP_ADMIN_PASS}
@@ -46,15 +47,18 @@ services:
       - WP_USER_MAIL=${WP_USER_MAIL}
       - WP_USER_PASS=${WP_USER_PASS}
       - WP_USER_USER=${WP_USER_USER}
-    restart: always
+    restart: unless-stopped
 
   mariadb:
     container_name: mariadb
-    build: ./requirements/mariadb/.
+    build:
+      context: requirements/mariadb
     networks:
       - backend
+    expose:
+      - "3306"
     volumes:
-      - wordpress_db:/data/wordpress_db
+      - wordpress_db:/data/wordpress_db/
     configs:
       - source: mariadb_conf
         target: /etc/my.cnf.d/mariadb.conf
@@ -63,29 +67,33 @@ services:
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    restart: unless-stopped
 
 volumes:
   wordpress_files:
     driver: local
+    name: wordpress_files
     driver_opts:
-      device: ${HOME}/data/wordpress
-      o: bind
       type: none
+      o: bind
+      device: ${HOME}/data/wordpress
   wordpress_db:
     driver: local
+    name: wordpress_db
     driver_opts:
-      device: ${HOME}/data/wordpress_db
-      o: bind
       type: none
+      o: bind
+      device: ${HOME}/data/wordpress_db
 
 configs:
   nginx_config:
+    name: nginx_config
     file: ./requirements/nginx/conf/nginx.conf
-  php-fpm_config:
-    file: ./requirements/wordpress/conf/php-fpm.conf
   wp_pool_conf:
+    name: wp_pool_conf
     file: ./requirements/wordpress/conf/wp_pool.conf
   mariadb_conf:
+    name: mariadb_conf
     file: ./requirements/mariadb/conf/mariadb.conf
 
 networks:
