@@ -9,16 +9,17 @@ services:
     ports:
       - "443:443"
     networks:
+      - frontend
       - backend
     depends_on:
       - wordpress
     volumes:
-      - wordpress_files:/data/wordpress
+      - wordpress_files:/data/wordpress/:ro
     configs:
       - source: nginx_config
         target: /etc/nginx/http.d/default.conf
     environment:
-      - DOMAIN_NAME=${DOMAIN_NAME}
+      - DOMAIN_NAME
     restart: unless-stopped
 
   wordpress:
@@ -27,26 +28,28 @@ services:
       context: requirements/wordpress
     networks:
       - backend
+    expose:
+      - "9000"
     depends_on:
       - mariadb
     volumes:
-      - wordpress_files:/data/wordpress
+      - wordpress_files:/data/wordpress/
     configs:
       - source: wp_pool_conf
         target: /etc/php8/php-fpm.d/wp_pool.conf
     environment:
-      - MARIADB_HOST=${MARIADB_HOST}
-      - MARIADB_DATABASE=${MARIADB_DATABASE}
-      - MARIADB_USER=${MARIADB_USER}
-      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
-      - DOMAIN_NAME=${DOMAIN_NAME}
-      - WP_TITLE=${WP_TITLE}
-      - WP_ADMIN_USER=${WP_ADMIN_USER}
-      - WP_ADMIN_PASS=${WP_ADMIN_PASS}
-      - WP_ADMIN_MAIL=${WP_ADMIN_MAIL}
-      - WP_USER_MAIL=${WP_USER_MAIL}
-      - WP_USER_PASS=${WP_USER_PASS}
-      - WP_USER_USER=${WP_USER_USER}
+      - MARIADB_HOST
+      - MARIADB_DATABASE
+      - MARIADB_USER
+      - MARIADB_PASSWORD
+      - DOMAIN_NAME
+      - WP_TITLE
+      - WP_ADMIN_USER
+      - WP_ADMIN_PASS
+      - WP_ADMIN_MAIL
+      - WP_USER_MAIL
+      - WP_USER_PASS
+      - WP_USER_USER
     restart: unless-stopped
 
   mariadb:
@@ -97,4 +100,7 @@ configs:
     file: ./requirements/mariadb/conf/mariadb.conf
 
 networks:
+  frontend:
   backend:
+    internal: true
+

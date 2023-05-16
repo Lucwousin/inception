@@ -8,7 +8,7 @@ ARG GID=1001
 # Add group/user with correct gid BEFORE apk adds it
 RUN addgroup --system --gid "$GID" mysql && \
     adduser --system --gecos mysql --ingroup mysql --home /var/lib/mysql mysql && \
-    apk update && apk add --no-cache mariadb && rm -rf /var/cache
+    apk add --no-cache mariadb && rm -rf /var/cache
 
 COPY ./tools/launch.sh /tools/launch.sh
 
