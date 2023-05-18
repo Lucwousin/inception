@@ -7,11 +7,15 @@ COMPOSE = docker compose -f ./srcs/docker-compose.yml
 
 all: up
 
+bonus: export COMPOSE_PROFILES=bonus
+bonus: all
+
 up: build
 	@$(COMPOSE) up --detach
 
 down:
-	@$(COMPOSE) down || echo "docker compose down failed, still continuing though"
+	@$(COMPOSE) --profile bonus down \
+		|| echo "docker compose down failed, still continuing though"
 
 build: $(VOLUMES)
 	@$(COMPOSE) build --build-arg "UID=`id -u`" --build-arg "GID=`id -g`"
@@ -20,7 +24,7 @@ start:
 	@$(COMPOSE) start
 
 stop:
-	@$(COMPOSE) stop
+	@$(COMPOSE) --profile bonus stop
 
 re: clean build up
 
@@ -65,5 +69,6 @@ $(ENV_FILE):
 	@echo "WP_USER_USER=sparesomechange" >> $(ENV_FILE)
 	@echo "WP_USER_MAIL=also@change.me" >> $(ENV_FILE)
 	@echo "WP_USER_PASS=changemetoo" >> $(ENV_FILE)
+	@echo "REDIS_PASSWORD=alsomakesureyouchangethis" >> $(ENV_FILE)
 
 .PHONY: all up down build re clean clean_images clean_volumes

@@ -38,6 +38,18 @@ if ! wp core is-installed; then
     --role=author
 fi
 
+if [ "$COMPOSE_PROFILES" != "" ]; then
+  if ! wp plugin is-installed redis-cache; then
+    wp plugin install redis-cache
+    wp config set WP_REDIS_HOST redis
+  fi
+  wp plugin is-active redis-cache || wp plugin activate redis-cache
+  wp config set WP_CACHE true
+elif wp plugin is-active redis-cache; then
+  wp plugin deactivate redis-cache
+  wp config set WP_CACHE false
+fi
+
 wp plugin update --all
 
 exec php-fpm8 -F

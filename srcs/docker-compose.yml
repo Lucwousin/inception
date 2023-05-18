@@ -50,6 +50,7 @@ services:
       - WP_USER_MAIL
       - WP_USER_PASS
       - WP_USER_USER
+      - COMPOSE_PROFILES
     restart: on-failure
 
   mariadb:
@@ -71,6 +72,22 @@ services:
       - MARIADB_PASSWORD
       - MARIADB_ROOT_PASSWORD
     restart: on-failure
+
+  redis:
+    profiles:
+      - bonus
+    container_name: redis
+    build:
+      context: requirements/bonus/redis
+    networks:
+      - backend
+    expose:
+      - "6379"
+    configs:
+      - source: redis_conf
+        target: /etc/redis/redis.conf
+    restart: on-failure
+
 
 volumes:
   wordpress_files:
@@ -98,6 +115,9 @@ configs:
   mariadb_conf:
     name: mariadb_conf
     file: ./requirements/mariadb/conf/mariadb.conf
+  redis_conf:
+    name: redis_conf
+    file: ./requirements/bonus/redis/conf/redis.conf
 
 networks:
   frontend:
