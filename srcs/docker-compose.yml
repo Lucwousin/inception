@@ -20,7 +20,7 @@ services:
         target: /etc/nginx/http.d/default.conf
     environment:
       - DOMAIN_NAME
-    restart: unless-stopped
+    restart: on-failure
 
   wordpress:
     container_name: wordpress
@@ -28,10 +28,10 @@ services:
       context: requirements/wordpress
     networks:
       - backend
-    expose:
-      - "9000"
     depends_on:
       - mariadb
+    expose:
+      - "9000"
     volumes:
       - wordpress_files:/data/wordpress/
     configs:
@@ -50,7 +50,7 @@ services:
       - WP_USER_MAIL
       - WP_USER_PASS
       - WP_USER_USER
-    restart: unless-stopped
+    restart: on-failure
 
   mariadb:
     container_name: mariadb
@@ -66,11 +66,11 @@ services:
       - source: mariadb_conf
         target: /etc/my.cnf.d/mariadb.conf
     environment:
-      - MARIADB_DATABASE=${MARIADB_DATABASE}
-      - MARIADB_USER=${MARIADB_USER}
-      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
-      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
-    restart: unless-stopped
+      - MARIADB_DATABASE
+      - MARIADB_USER
+      - MARIADB_PASSWORD
+      - MARIADB_ROOT_PASSWORD
+    restart: on-failure
 
 volumes:
   wordpress_files:
@@ -102,5 +102,3 @@ configs:
 networks:
   frontend:
   backend:
-    internal: true
-

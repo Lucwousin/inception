@@ -16,6 +16,12 @@ down:
 build: $(VOLUMES)
 	@$(COMPOSE) build --build-arg "UID=`id -u`" --build-arg "GID=`id -g`"
 
+start:
+	@$(COMPOSE) start
+
+stop:
+	@$(COMPOSE) stop
+
 re: clean build up
 
 clean: down prune clean_images clean_volumes

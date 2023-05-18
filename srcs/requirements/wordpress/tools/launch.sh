@@ -1,42 +1,43 @@
 #!/bin/sh
 
-cd /data/wordpress
+until mariadb --host="$MARIADB_HOST" --user="$MARIADB_USER" --password="$MARIADB_PASSWORD" "$MARIADB_DATABASE"; do
+  echo "Database not yet running, retrying in a second..."
+  sleep 1
+done
+echo "Connected to database"
 
-G_ARGS="--path=/data/wordpress --user=wp_pool"
-chown "wp_pool:wp_pool" -R /data/wordpress
+# Don't attempt to download wordpress every time the config fails
+if [ ! -f ./license.txt ]; then
+  echo "Downloading wordpress core"
+  wp core download
+fi
 
 if [ ! -f /data/wordpress/wp-config.php ]; then
-  wp core download $G_ARGS
-  wp config create $G_ARGS \
+  echo "Creating wordpress config"
+  wp config create \
       --dbname="$MARIADB_DATABASE" \
       --dbuser="$MARIADB_USER" \
       --dbpass="$MARIADB_PASSWORD" \
       --dbhost="$MARIADB_HOST" \
       --dbcharset="utf8" \
       --dbcollate="utf8_general_ci"
-
-  # it's okay if the db already exists... right?!
-  wp db create $G_ARGS || true
 fi
 
-# now it should really exist, otherwise it's probably a good time to fail
-until wp db check $G_ARGS; do
-  sleep 1
-done
+if ! wp core is-installed; then
+  echo "Installing wordpress"
+  wp core install \
+    --url="$DOMAIN_NAME" \
+    --title="$WP_TITLE" \
+    --admin_user="$WP_ADMIN_USER" \
+    --admin_password="$WP_ADMIN_PASS" \
+    --admin_email="$WP_ADMIN_MAIL" \
+    --skip-email
 
-wp core is-installed $G_ARGS ||
-    (wp core install $G_ARGS --url=$DOMAIN_NAME \
-        --title=$WP_TITLE --admin_user=$WP_ADMIN_USER \
-        --admin_password=$WP_ADMIN_PASS --admin_email=$WP_ADMIN_MAIL \
-        --skip-email && \
-    wp user create $WP_USER_USER $WP_USER_MAIL \
-        $G_ARGS --user_pass=$WP_USER_PASS --role=author && \
-    wp plugin update $G_ARGS --all)
+  wp user create "$WP_USER_USER" "$WP_USER_MAIL" \
+    --user_pass="$WP_USER_PASS" \
+    --role=author
+fi
 
-#until mariadb --host=$MARIADB_HOST --user=$MARIADB_USER --password=$MARIADB_PASSWORD $MARIADB_DATABASE; do
-#  echo "Database not yet running, retrying in a second..."
-#  sleep 1
-#done
-#echo "Connected to database"
+wp plugin update --all
 
 exec php-fpm8 -F
