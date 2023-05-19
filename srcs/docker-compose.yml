@@ -88,6 +88,28 @@ services:
         target: /etc/redis/redis.conf
     restart: on-failure
 
+  ftp:
+    profiles:
+      - bonus
+    container_name: ftp
+    build:
+      context: requirements/bonus/ftp
+    ports:
+      - "20"
+      - "21"
+      - "990"
+      - "21000-21010"
+    networks:
+      - frontend
+    volumes:
+      - wordpress_files:/data/wordpress/
+    configs:
+      - source: ftp_conf
+        target: /etc/vsftpd/vsftpd.conf
+    environment:
+      - FTP_USER
+      - FTP_PASSWORD
+    restart: on-failure
 
 volumes:
   wordpress_files:
@@ -118,6 +140,9 @@ configs:
   redis_conf:
     name: redis_conf
     file: ./requirements/bonus/redis/conf/redis.conf
+  ftp_conf:
+    name: ftp_conf
+    file: ./requirements/bonus/ftp/conf/vsftpd.conf
 
 networks:
   frontend:

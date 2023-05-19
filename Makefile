@@ -67,5 +67,7 @@ $(ENV_FILE):
 	@echo "WP_USER_USER=sparesomechange" >> $(ENV_FILE)
 	@echo "WP_USER_MAIL=also@change.me" >> $(ENV_FILE)
 	@echo "WP_USER_PASS=changemetoo" >> $(ENV_FILE)
+	@echo "FTP_USER=ftp_user" >> $(ENV_FILE)
+	@echo "FTP_PASSWORD=ftp_password" >> $(ENV_FILE)
 
 .PHONY: all up down build re clean clean_images clean_volumes
