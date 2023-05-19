@@ -7,6 +7,12 @@ ARG FTP_PASSWORD
 RUN apk add --no-cache vsftpd && \
     addgroup --system --gid "$GID" "$FTP_USER" && \
     adduser --system --uid "$UID" --gecos "" --ingroup "$FTP_USER" "$FTP_USER" && \
-    echo "$FTP_USER:$FTP_PASSWORD" | chpasswd
+    echo "$FTP_USER:$FTP_PASSWORD" | chpasswd &&  \
+    touch /var/log/vsftpd.log && chmod a+rw /var/log/vsftpd.log && \
+    echo "$FTP_USER" > /etc/vsftpd/vsftpd.userlist
 
-ENTRYPOINT ["vsftpd", "/etc/vsftpd.conf"]
+# Can not use configs in the compose file for this, as it needs to be owned by root
+# and the uid/gid options in configs do not work
+COPY conf/vsftpd.conf /etc/vsftpd/vsftpd.conf
+
+ENTRYPOINT ["vsftpd", "/etc/vsftpd/vsftpd.conf"]

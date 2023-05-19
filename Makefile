@@ -28,13 +28,15 @@ stop:
 
 re: clean build up
 
-clean: down prune clean_images clean_volumes
+clean: down prune clean_images
 
 prune:
 	@docker system prune --force
 
-fprune:
+# Remove all docker data, and clean up the files in the home dir
+fclean: clean
 	@docker system prune --all --force
+	$(foreach vol, $(VOLUMES), @rm -rf $(vol))
 
 clean_images:
 	$(eval IMGS = $(shell docker image ls -q))
@@ -45,7 +47,6 @@ clean_volumes:
 	$(eval VOLS = $(shell docker volume ls -q))
 	$(if $(VOLS), @echo "Cleaning volumes $(VOLS)"; \
 		docker volume rm $(VOLS) || echo "cleaning volumes failed")
-	$(foreach vol, $(VOLUMES), @rm -rf $(vol))
 
 $(VOLUMES):
 	@mkdir -p -m 0775 $(VOLUMES)
