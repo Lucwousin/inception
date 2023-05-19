@@ -98,10 +98,10 @@ services:
         - FTP_USER=${FTP_USER}
         - FTP_PASSWORD=${FTP_PASSWORD}
     ports:
-      - "20"
-      - "21"
-      - "990"
-      - "21000-21010"
+      - "20:20"
+      - "21:21"
+      - "990:990"
+      - "21000-21010:21000-21010"
     networks:
       - frontend
     volumes:
@@ -109,6 +109,8 @@ services:
     configs:
       - source: ftp_conf
         target: /etc/vsftpd/vsftpd.conf
+        uid: "0"
+        gid: "0"
     restart: on-failure
 
 volumes:

@@ -7,6 +7,6 @@ ARG FTP_PASSWORD
 RUN apk add --no-cache vsftpd && \
     addgroup --system --gid "$GID" "$FTP_USER" && \
     adduser --system --uid "$UID" --gecos "" --ingroup "$FTP_USER" "$FTP_USER" && \
-    echo "$FTP_PASSWORD" | passwd ftp
+    echo "$FTP_USER:$FTP_PASSWORD" | chpasswd
 
-ENTRYPOINT ["vsftpd"]
+ENTRYPOINT ["vsftpd", "/etc/vsftpd.conf"]
