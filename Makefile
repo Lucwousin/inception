@@ -48,13 +48,11 @@ clean_volumes:
 	$(foreach vol, $(VOLUMES), @rm -rf $(vol))
 
 $(VOLUMES):
-	@mkdir --mode=0775 -p $(VOLUMES)
+	@mkdir -p -m 0775 $(VOLUMES)
 
 $(ENV_FILE):
 	@echo "Creating default env file.."
 	@echo "DOMAIN_NAME=$(USER).codam.nl" >> $(ENV_FILE)
-	@echo "LOCAL_UID=$(shell id -u)" >> $(ENV_FILE)
-	@echo "LOCAL_GID=$(shell id -g)" >> $(ENV_FILE)
 	@echo "# Mariadb" >> $(ENV_FILE)
 	@echo "MARIADB_HOST=mariadb" >> $(ENV_FILE)
 	@echo "MARIADB_DATABASE=wordpress" >> $(ENV_FILE)
@@ -69,6 +67,5 @@ $(ENV_FILE):
 	@echo "WP_USER_USER=sparesomechange" >> $(ENV_FILE)
 	@echo "WP_USER_MAIL=also@change.me" >> $(ENV_FILE)
 	@echo "WP_USER_PASS=changemetoo" >> $(ENV_FILE)
-	@echo "REDIS_PASSWORD=alsomakesureyouchangethis" >> $(ENV_FILE)
 
 .PHONY: all up down build re clean clean_images clean_volumes

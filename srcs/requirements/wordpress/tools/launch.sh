@@ -43,8 +43,8 @@ if [ "$COMPOSE_PROFILES" != "" ]; then
     wp plugin install redis-cache
     wp config set WP_REDIS_HOST redis
   fi
-  wp plugin is-active redis-cache || wp plugin activate redis-cache
   wp config set WP_CACHE true
+  wp plugin is-active redis-cache || wp plugin activate redis-cache
 elif wp plugin is-active redis-cache; then
   wp plugin deactivate redis-cache
   wp config set WP_CACHE false
