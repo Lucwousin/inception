@@ -45,9 +45,21 @@ if [ "$COMPOSE_PROFILES" != "" ]; then
   fi
   wp config set WP_CACHE true
   wp plugin is-active redis-cache || wp plugin activate redis-cache
-elif wp plugin is-active redis-cache; then
-  wp plugin deactivate redis-cache
-  wp config set WP_CACHE false
+  wp redis enable
+
+  if [ ! -d adminer ]; then
+    mkdir -p adminer
+    curl -L --output ./adminer/index.php "https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1-mysql-en.php"
+  fi
+else
+  if wp plugin is-active redis-cache; then
+    wp plugin deactivate redis-cache
+    wp config set WP_CACHE false
+  fi
+
+  if [ -d adminer]; then
+    rm -rf adminer
+  fi
 fi
 
 wp plugin update --all

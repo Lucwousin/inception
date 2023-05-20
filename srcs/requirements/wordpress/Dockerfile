@@ -11,6 +11,7 @@ RUN apk update && apk add --no-cache \
     php-mysqli      \
     php-iconv       \
     php-tokenizer   \
+    php-session     \
     mariadb-client
 
 
