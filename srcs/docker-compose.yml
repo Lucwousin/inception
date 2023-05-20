@@ -113,6 +113,23 @@ services:
 #        gid: "0" <-- documentation lies
     restart: on-failure
 
+  git_server:
+    profiles:
+      - bonus
+    container_name: git_server
+    build:
+      context: requirements/bonus/git_server
+      args:
+        - GIT_PASSWORD=${GIT_PASSWORD}
+        - SSH_PUBKEYS=${SSH_PUBKEYS}
+    ports:
+      - "22:22"
+    networks:
+      - frontend
+    volumes:
+      - git_repo:/git/
+    restart: on-failure
+
 volumes:
   wordpress_files:
     driver: local
@@ -128,6 +145,13 @@ volumes:
       type: none
       o: bind
       device: ${HOME}/data/wordpress_db
+  git_repo:
+    driver: local
+    name: git_repo
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/git_repo
 
 configs:
   nginx_config:
