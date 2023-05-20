@@ -115,19 +115,23 @@ services:
 
   git_server:
     profiles:
-      - bonus
+      - boner
     container_name: git_server
     build:
       context: requirements/bonus/git_server
       args:
         - GIT_PASSWORD=${GIT_PASSWORD}
-        - SSH_PUBKEYS=${SSH_PUBKEYS}
+        - DOMAIN_NAME=${DOMAIN_NAME}
+    hostname: ${DOMAIN_NAME}
     ports:
       - "22:22"
     networks:
       - frontend
     volumes:
-      - git_repo:/git/
+      - git_server:/git/
+    configs:
+      - source: git_sshd
+        target: /etc/ssh/sshd_config
     restart: on-failure
 
 volumes:
@@ -145,13 +149,13 @@ volumes:
       type: none
       o: bind
       device: ${HOME}/data/wordpress_db
-  git_repo:
+  git_server:
     driver: local
-    name: git_repo
+    name: git_server
     driver_opts:
       type: none
       o: bind
-      device: ${HOME}/data/git_repo
+      device: ${HOME}/data/git_server
 
 configs:
   nginx_config:
@@ -166,6 +170,9 @@ configs:
   redis_conf:
     name: redis_conf
     file: ./requirements/bonus/redis/conf/redis.conf
+  git_sshd:
+    name: git_sshd
+    file: ./requirements/bonus/git_server/conf/sshd_config
 #  ftp_conf:
 #    name: ftp_conf
 #    file: ./requirements/bonus/ftp/conf/vsftpd.conf
