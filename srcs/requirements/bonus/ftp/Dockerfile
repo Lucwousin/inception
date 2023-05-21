@@ -14,5 +14,6 @@ RUN apk add --no-cache vsftpd && \
 # Can not use configs in the compose file for this, as it needs to be owned by root
 # and the uid/gid options in configs do not work
 COPY conf/vsftpd.conf /etc/vsftpd/vsftpd.conf
+COPY tools/launch.sh /tools/launch.sh
 
-ENTRYPOINT ["vsftpd", "/etc/vsftpd/vsftpd.conf"]
+ENTRYPOINT ["/tools/launch.sh"]
