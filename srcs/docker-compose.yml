@@ -115,7 +115,7 @@ services:
 
   git_server:
     profiles:
-      - boner
+      - bonus
     container_name: git_server
     build:
       context: requirements/bonus/git_server

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+REPO="$HOME/repos/$2.git"
+
+if [ "$1" = "init" ]; then
+  if [ -d "$REPO" ]; then
+    echo "Repository $2 already exists!" >&2
+    exit 1
+  fi
+
+  mkdir -p "$REPO"
+  cd "$REPO" || exit 1
+
+  git init --bare
+  exit 0
+elif [ "$1" = "rm" ]; then
+  rm -rf "$REPO"
+  echo "Deleted repository $2"
+elif [ "$1" = "ls" ]; then
+  cd ~/repos || exit 1
+  ls
+else
+  echo "Usage: repo (init|rm)"
+fi

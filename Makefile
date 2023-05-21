@@ -1,7 +1,7 @@
 NAME := inception
 
 ENV_FILE := ./srcs/.env
-VOLUMES := $(addprefix ~/data/, wordpress_db wordpress)
+VOLUMES := $(addprefix ~/data/, wordpress_db wordpress git_server)
 
 COMPOSE = docker compose -f ./srcs/docker-compose.yml
 
@@ -70,5 +70,6 @@ $(ENV_FILE):
 	@echo "WP_USER_PASS=changemetoo" >> $(ENV_FILE)
 	@echo "FTP_USER=ftp_user" >> $(ENV_FILE)
 	@echo "FTP_PASSWORD=ftp_password" >> $(ENV_FILE)
+	@echo "GIT_PASSWORD=git_password" >> $(ENV_FILE)
 
 .PHONY: all up down build re clean clean_images clean_volumes

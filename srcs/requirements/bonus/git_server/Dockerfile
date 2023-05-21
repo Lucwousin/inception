@@ -16,6 +16,11 @@ RUN apk add --no-cache openssh git && \
     find /etc/ssh -not -name "*.pub" -exec ssh-keygen -c -C "root@$DOMAIN_NAME" -f "{}" ";"
 
 USER git
-RUN ssh-keygen -f ~/.ssh/id_rsa -C git@$DOMAIN_NAME -N ""
+RUN ssh-keygen -f ~/.ssh/id_rsa -C git@$DOMAIN_NAME -N "" && \
+    mkdir -p ~/.ssh/keys && mkdir -p ~/repos && \
+    ln -s /tools/git-shell-commands /git/git-shell-commands
+COPY tools/getkeys.sh /tools/getkeys.sh
+COPY tools/git-shell-commands /tools/git-shell-commands
 
-ENTRYPOINT ["/usr/sbin/sshd", "-D"]
+USER root
+ENTRYPOINT ["/usr/sbin/sshd", "-D", "-e"]

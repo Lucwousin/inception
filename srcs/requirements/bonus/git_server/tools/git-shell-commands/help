@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cat << "EOF"
+Add your (PUBLIC!) ssh key using `addkey <name> `cat ~/.ssh/id_rsa.pub`'
+Or create/remove/list a repo using `repo' (try using it)
+EOF
