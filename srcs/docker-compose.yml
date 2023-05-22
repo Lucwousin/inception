@@ -20,6 +20,7 @@ services:
         target: /etc/nginx/http.d/default.conf
     environment:
       - DOMAIN_NAME
+      - COMPOSE_PROFILES
     restart: on-failure
 
   wordpress:
