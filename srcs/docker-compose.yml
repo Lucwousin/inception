@@ -14,7 +14,7 @@ services:
     depends_on:
       - wordpress
     volumes:
-      - wordpress_files:/data/wordpress/:ro
+      - wordpress_files:/data/wordpress/
     configs:
       - source: nginx_config
         target: /etc/nginx/http.d/default.conf
